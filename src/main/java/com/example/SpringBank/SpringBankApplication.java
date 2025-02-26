@@ -1,13 +1,13 @@
-package com.example.banco.banco_virtual;
+package com.example.SpringBank;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BancoVirtualApplication {
+public class SpringBankApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BancoVirtualApplication.class, args);
+		SpringApplication.run(SpringBankApplication.class, args);
 	}
 
 }
