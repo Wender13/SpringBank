@@ -1,0 +1,6 @@
+/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/SpringBankApplication.java
+/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/config/SecurityConfig.java
+/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/controller/UsuarioController.java
+/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/model/Usuario.java
+/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/repository/UsuarioRepository.java
+/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/service/UsuarioService.java
