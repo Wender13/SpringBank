@@ -1,6 +1,11 @@
-/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/SpringBankApplication.java
-/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/config/SecurityConfig.java
-/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/controller/UsuarioController.java
-/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/model/Usuario.java
-/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/repository/UsuarioRepository.java
-/home/jr/SpringBank/backend/src/main/java/com/example/SpringBank/service/UsuarioService.java
+/home/jr/SpringBank/backend/src/main/java/dev/jr/SpringBank/Aplicacao.java
+/home/jr/SpringBank/backend/src/main/java/dev/jr/SpringBank/config/SecurityConfig.java
+/home/jr/SpringBank/backend/src/main/java/dev/jr/SpringBank/config/SimpleCorsFilter.java
+/home/jr/SpringBank/backend/src/main/java/dev/jr/SpringBank/controller/TransacaoController.java
+/home/jr/SpringBank/backend/src/main/java/dev/jr/SpringBank/controller/UsuarioController.java
+/home/jr/SpringBank/backend/src/main/java/dev/jr/SpringBank/model/Transacao.java
+/home/jr/SpringBank/backend/src/main/java/dev/jr/SpringBank/model/Usuario.java
+/home/jr/SpringBank/backend/src/main/java/dev/jr/SpringBank/repository/TransacaoRepository.java
+/home/jr/SpringBank/backend/src/main/java/dev/jr/SpringBank/repository/UsuarioRepository.java
+/home/jr/SpringBank/backend/src/main/java/dev/jr/SpringBank/service/TransacaoService.java
+/home/jr/SpringBank/backend/src/main/java/dev/jr/SpringBank/service/UsuarioService.java
