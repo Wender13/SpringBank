@@ -1,13 +1,13 @@
 package dev.jr.SpringBank.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import dev.jr.SpringBank.model.Transacao;
+import dev.jr.SpringBank.model.Transaction;
 import java.util.List;
 
-public interface TransacaoRepository extends MongoRepository<Transacao, String> {
+public interface TransactionRepository extends MongoRepository<Transaction, String> {
     // Consultar transações onde o usuário remetente (usuario.id) seja igual ao usuárioId fornecido
-    List<Transacao> findByUsuario_Id(String usuarioId);
+    List<Transaction> findByUsuario_Id(String usuarioId);
 
     // Consultar transações onde o usuário destinatário (destino.id) seja igual ao usuarioId fornecido
-    List<Transacao> findByDestinatario_Id(String destinoId);
+    List<Transaction> findByDestinatario_Id(String destinoId);
 }

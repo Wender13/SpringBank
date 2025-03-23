@@ -1,26 +1,26 @@
-package dev.jr.SpringBank.controller;
+// package dev.jr.SpringBank.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.web.bind.annotation.*;
 
-import dev.jr.SpringBank.service.TransacaoService;
-import dev.jr.SpringBank.model.Transacao;
+// import dev.jr.SpringBank.service.TransacaoService;
+// import dev.jr.SpringBank.model.Transacao;
 
-import java.util.List;
+// import java.util.List;
 
-@RestController
-@RequestMapping("/transacoes")
-public class TransacaoController {
+// @RestController
+// @RequestMapping("/transacoes")
+// public class TransacaoController {
 
-    @Autowired
-    private TransacaoService transacaoService;
+//     @Autowired
+//     private TransacaoService transacaoService;
 
-    public TransacaoController(TransacaoService transacaoService) {
-        this.transacaoService = transacaoService;
-    }
+//     public TransacaoController(TransacaoService transacaoService) {
+//         this.transacaoService = transacaoService;
+//     }
 
-    @GetMapping("/usuario/{usuarioId}")
-    public List<Transacao> listarTransacoesPorUsuario(@PathVariable String usuarioId) {
-        return transacaoService.listarTransacoesPorUsuario(usuarioId);
-    }
-}
+//     @GetMapping("/usuario/{usuarioId}")
+//     public List<Transacao> listarTransacoesPorUsuario(@PathVariable String usuarioId) {
+//         return transacaoService.listarTransacoesPorUsuario(usuarioId);
+//     }
+// }
