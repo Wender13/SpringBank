@@ -46,13 +46,13 @@ public class User implements UserDetails {
     public User() {
     }
     
-    public User(String login, String password, UserRole role, String name, String email, String cpf) {
+    public User(String login, String password, String name, String email, String cpf) {
         this.login = login;
         this.password = password;
-        this.role = role;
         this.name = name;
         this.email = email;
         this.cpf = cpf;
+        this.role = UserRole.USER;
     }
 
     // Getters e Setters
@@ -127,7 +127,6 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUsername'");
+        return this.login;
     }
 }

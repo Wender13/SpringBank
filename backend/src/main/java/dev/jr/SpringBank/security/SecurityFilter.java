@@ -18,28 +18,41 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
-    @Autowired
-    TokenService tokenService;
-
-    @Autowired
-    UserRepository userRepository;
+    private final TokenService tokenService;
+    private final UserRepository userRepository;
+    
+    public SecurityFilter(TokenService tokenService, UserRepository userRepository) {
+        this.tokenService = tokenService;
+        this.userRepository = userRepository;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var token = this.recoverToken(request);
         if(token != null){
             var login = tokenService.validateToken(token);
+
+            // Verificar o valor do login extraído do token
+            System.out.println("Login extraído do token: " + login); // ADICIONADO AQUI
+
             UserDetails user = userRepository.findByLogin(login);
 
-            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if(user != null){
+                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                System.out.println("Usuário não encontrado!");
+            }
+        } else {
+            System.out.println("Token não encontrado!");
         }
         filterChain.doFilter(request, response);
     }
 
+
+
     private String recoverToken(HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
-        if(authHeader == null) return null;
-        return authHeader.replace("Bearer ", "");
-    }
+        return (authHeader != null && authHeader.startsWith("Bearer ")) ? authHeader.substring(7) : null;
+    }    
 }

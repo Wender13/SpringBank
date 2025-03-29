@@ -1,13 +1,8 @@
 dev/jr/SpringBank/repository/UserRepository.class
-dev/jr/SpringBank/model/NotBlank.class
-dev/jr/SpringBank/security/SecurityConfig.class
 dev/jr/SpringBank/model/UserRole.class
 dev/jr/SpringBank/model/LoginReponseDTO.class
-dev/jr/SpringBank/model/User.class
 dev/jr/SpringBank/controller/AuthController.class
 dev/jr/SpringBank/model/AuthDTO.class
-dev/jr/SpringBank/security/SecurityFilter.class
 dev/jr/SpringBank/SpringBankApplication.class
-dev/jr/SpringBank/security/TokenService.class
 dev/jr/SpringBank/model/RegisterDTO.class
 dev/jr/SpringBank/service/AuthService.class

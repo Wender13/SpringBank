@@ -24,17 +24,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-        .csrf(csrf -> csrf.disable())
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-            .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-            .requestMatchers(HttpMethod.POST, "/users").hasRole("ADMIN")
-            .anyRequest().authenticated()
-        )
-        .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-        .build();
+            .csrf(csrf -> csrf.disable())  // Desabilitando a proteção CSRF
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Configurando para não usar sessão
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()  // Permitir login sem autenticação
+                .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()  // Permitir registro sem autenticação
+                .requestMatchers(HttpMethod.DELETE, "/users/delete/{login}").hasRole("ADMIN")  // Apenas admins podem deletar usuários
+                .requestMatchers(HttpMethod.PUT, "/users").hasAnyRole("ADMIN", "USER")  // Administradores podem modificar qualquer conta, usuários podem modificar seus próprios dados
+                .anyRequest().authenticated()  // Requer autenticação para todas as outras requisições
+            )
+            .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)  // Adicionando o filtro de segurança antes do filtro padrão
+            .build();  // Construindo a configuração de segurança
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {

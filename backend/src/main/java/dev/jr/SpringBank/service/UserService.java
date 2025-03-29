@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import dev.jr.SpringBank.model.User;
@@ -20,32 +21,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // @Autowired
+    @Autowired
     private TransactionService transactionService;
-
-    // Criar usuário
-    public User createUser(User user) {
-        if (user.getName().isEmpty()) {
-            throw new IllegalArgumentException("O nome é obrigatório!");
-        }
-        if (user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("O e-mail é obrigatório!");
-        }
-        if (user.getCPF().isEmpty()) {
-            throw new IllegalArgumentException("O CPF é obrigatório!");
-        }
-        if (user.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("A senha é obrigatória!");
-        }
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("E-mail já cadastrado!");
-        }
-        if (userRepository.findByCPF(user.getCPF()).isPresent()) {
-            throw new IllegalArgumentException("CPF já cadastrado!");
-        }
-
-        return userRepository.save(user);
-    }
 
     // Atualizar dados do usuário
     public void updateUserName(User user, String newUserName){
@@ -114,32 +91,47 @@ public class UserService {
     }
 
     // Depositar saldo
-    public User deposit(String id, double value) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
+    public User deposit(String login, double value) {
+        // Recupera o UserDetails
+        UserDetails userDetails = userRepository.findByLogin(login);
+        
+        if (userDetails != null && userDetails instanceof User) { // Verifica se é do tipo User
+            User user = (User) userDetails;  // Faz o cast para User
+    
+            if (value <= 0) {
+                throw new IllegalArgumentException("O valor do depósito deve ser positivo!");
+            }
+    
             user.setBalance(user.getBalance() + value);
-            //Registro da transação
+            
+            // Registro da transação
             transactionService.registerTransaction(new Transaction(user, "DEPOSITO", value, LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"))));
-
-            return userRepository.save(user);
+            
+            return userRepository.save(user);  // Salva o usuário após o depósito
         }
+    
         throw new RuntimeException("Usuário não encontrado!");
     }
     
+    
     // Sacar saldo
-    public User sacar(String id, double value) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            if (user.getBalance() >= value) {
-                user.setBalance(user.getBalance() - value);
-                //Registro da transação
-                transactionService.registerTransaction(new Transaction(user, "SAQUE", -value, LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"))));
-                return userRepository.save(user);
+    public User withdraw(String login, double value) {
+        UserDetails userDetails = userRepository.findByLogin(login);
+        if (userDetails != null && userDetails instanceof User) { // Verifica se é do tipo User
+            User user = (User) userDetails;  // Faz o cast para User
+    
+            if (value <= 0) {
+                throw new IllegalArgumentException("O valor do saque deve ser positivo!");
             }
-            throw new RuntimeException("Saldo insuficiente!");
+    
+            user.setBalance(user.getBalance() - value);
+            
+            // Registro da transação
+            transactionService.registerTransaction(new Transaction(user, "SAQUE", value, LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"))));
+            
+            return userRepository.save(user);  // Salva o usuário após o depósito
         }
+    
         throw new RuntimeException("Usuário não encontrado!");
     }
 
@@ -167,10 +159,19 @@ public class UserService {
         throw new RuntimeException("Um ou ambos os usuários não foram encontrados!");
     }
 
-    // // Remover usuário
-    // public void removeUser(String login) {
-    //     User user = userRepository.findByLogin(login).get();
-    //             .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado!"));
-    //     userRepository.deleteById(user.getUsername());
-    // }
+    // Remover usuário
+    public void deleteUser(String login) {
+        
+        UserDetails user = userRepository.findByLogin(login);
+
+        if(user == null)throw new UsernameNotFoundException("Usuário não encontrado!");
+        if (user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) throw new IllegalStateException("Não é possível remover um administrador!");
+        
+        userRepository.deleteByLogin(login);
+    }
+
+    // Buscar usuário por Login
+    public User findUserByLogin(String login) {
+        return (User) userRepository.findByLogin(login);
+    }
 }

@@ -5,9 +5,9 @@ import dev.jr.SpringBank.model.Transaction;
 import java.util.List;
 
 public interface TransactionRepository extends MongoRepository<Transaction, String> {
-    // Consultar transações onde o usuário remetente (usuario.id) seja igual ao usuárioId fornecido
-    List<Transaction> findByUsuario_Id(String usuarioId);
+    // Consultar transações onde o usuário remetente (user.id) seja igual ao usuárioId fornecido
+    List<Transaction> findByUser_Id(String userId);
 
-    // Consultar transações onde o usuário destinatário (destino.id) seja igual ao usuarioId fornecido
-    List<Transaction> findByDestinatario_Id(String destinoId);
+    // Consultar transações onde o usuário destinatário (benefited.id) seja igual ao usuarioId fornecido
+    List<Transaction> findByBenefited_Id(String benefitedId);
 }

@@ -50,7 +50,7 @@ public class AuthController {
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         dev.jr.SpringBank.model.User newUser = new dev.jr.SpringBank.model.User(
-            data.login(), encryptedPassword, data.role(), data.name(), data.email(), data.cpf());
+            data.login(), encryptedPassword, data.name(), data.email(), data.cpf());
 
             this.userRepository.save(newUser);
 
