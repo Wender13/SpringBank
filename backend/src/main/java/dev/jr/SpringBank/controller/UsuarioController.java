@@ -21,26 +21,28 @@ public class UsuarioController {
 
     // Atualizar login do usuário
     @PutMapping("/changeUserLogin")
-    public ResponseEntity<?> changeUserLogin(@RequestBody User user, @RequestParam String newUserLogin) {
-        return updateUserField(user.getLogin(), () -> userService.updateUserName(user, newUserLogin), "Login atualizado com sucesso.");
+    public ResponseEntity<?> changeUserLogin(@RequestParam String currentLogin, @RequestParam String newUserLogin) {
+        userService.updateUserLogin(currentLogin, newUserLogin);
+        return ResponseEntity.ok("Login atualizado com sucesso.");
     }
 
     // Atualizar e-mail do usuário
     @PutMapping("/changeUserEmail")
-    public ResponseEntity<?> changeUserEmail(@RequestBody User user, @RequestParam String newUserEmail) {
-        return updateUserField(user.getLogin(), () -> userService.updateUserEmail(user, newUserEmail), "E-mail atualizado com sucesso.");
+    public ResponseEntity<?> changeUserEmail(@RequestParam String login, @RequestParam String newUserEmail) {
+        return updateUserField(login, () -> userService.updateUserEmail(login, newUserEmail), "E-mail atualizado com sucesso.");
     }
+
 
     // Atualizar senha do usuário
     @PutMapping("/changeUserPassword")
-    public ResponseEntity<?> changeUserPassword(@RequestBody User user, @RequestParam String newUserPassword) {
-        return updateUserField(user.getLogin(), () -> userService.updatePassword(user, newUserPassword), "Senha atualizada com sucesso.");
+    public ResponseEntity<?> changeUserPassword(@RequestParam String login, @RequestParam String newUserPassword) {
+        return updateUserField(login, () -> userService.updatePassword(login, newUserPassword), "Senha atualizada com sucesso.");
     }
 
     // Atualizar nome completo do usuário
     @PutMapping("/changeUserName")
-    public ResponseEntity<?> changeUserName(@RequestBody User user, @RequestParam String newUserName) {
-        return updateUserField(user.getLogin(), () -> userService.updateName(user, newUserName), "Nome atualizado com sucesso.");
+    public ResponseEntity<?> changeUserName(@RequestParam String login, @RequestParam String newUserName) {
+        return updateUserField(login, () -> userService.updateName(login, newUserName), "Nome atualizado com sucesso.");
     }
 
     // Depositar saldo
@@ -65,7 +67,7 @@ public class UsuarioController {
 
     // Excluir usuário por login
     @DeleteMapping("/delete/{login}")
-    public ResponseEntity<?> deleteUser(@PathVariable String login) {
+    public ResponseEntity<?> deleteUser(@RequestParam String login) {
         User userFromDb = userService.findUserByLogin(login);
         if (userFromDb == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado.");

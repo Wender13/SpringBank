@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import dev.jr.SpringBank.model.User;
@@ -25,30 +27,41 @@ public class UserService {
     private TransactionService transactionService;
 
     // Atualizar dados do usuário
-    public void updateUserName(User user, String newUserName){
-        if (newUserName.isEmpty()) {
+    public void updateUserLogin(String currentLogin, String newUserLogin) {
+        if (newUserLogin.isEmpty()) {
             throw new IllegalArgumentException("O novo nome de usuário é obrigatório!");
         }
-
-        UserDetails existingUser = userRepository.findByLogin(newUserName);
-        if (existingUser != null) {
-            if (existingUser.getUsername().equals(user.getName())) {
-            throw new IllegalArgumentException("Este já é seu nome de usuário!");
-            } else {
+    
+        // Verifica se o novo login já existe
+        UserDetails existingUserDetails = userRepository.findByLogin(newUserLogin);
+        if (existingUserDetails instanceof User) {
             throw new IllegalArgumentException("O nome de usuário já está em uso!");
-            }
         }
-
-        user.setName(newUserName);
-        userRepository.save(user);
+    
+        // Busca o usuário pelo login atual
+        UserDetails currentUserDetails = userRepository.findByLogin(currentLogin);
+        if (!(currentUserDetails instanceof User currentUser)) {
+            throw new IllegalArgumentException("Usuário não encontrado!");
+        }
+    
+        // Atualiza o login e salva no banco
+        currentUser.setLogin(newUserLogin);
+        userRepository.save(currentUser);
     }
+    
+    
 
     // Atualizar e-mail do usuário
-    public void updateUserEmail(User user, String newEmail) {
+    public void updateUserEmail(String login, String newEmail) {
         if (newEmail.isEmpty()) {
             throw new IllegalArgumentException("O novo e-mail é obrigatório!");
         }
-
+    
+        User user = (User) userRepository.findByLogin(login);
+        if (user == null) {
+            throw new IllegalArgumentException("Usuário não encontrado!");
+        }
+    
         Optional<User> existingUser = userRepository.findByEmail(newEmail);
         if (existingUser.isPresent()) {
             if (existingUser.get().getId().equals(user.getId())) {
@@ -57,36 +70,53 @@ public class UserService {
                 throw new IllegalArgumentException("O e-mail já está em uso!");
             }
         }
-
+    
         user.setEmail(newEmail);
         userRepository.save(user);
-    }
-
-    // Alterar nome completo do usuário
-    public void updateName(User user, String newName) {
-        if (newName.isEmpty()) {
-            throw new IllegalArgumentException("O novo nome completo é obrigatório!");
-        }
-
-        if (newName.equals(user.getName())) {
-            throw new IllegalArgumentException("Este já é seu nome completo!");
-        }
-
-        user.setName(newName);
-        userRepository.save(user);
-    }
+    }    
 
     // Alterar senha do usuário
-    public void updatePassword(User user, String newPassword) {
+    public void updatePassword(String login, String newPassword) {
         if (newPassword.isEmpty()) {
             throw new IllegalArgumentException("A nova senha é obrigatória!");
         }
+    
+        UserDetails userDetails = userRepository.findByLogin(login);
+        if (!(userDetails instanceof User)) {
+            throw new IllegalArgumentException("Usuário não encontrado!");
+        }
+        User user = (User) userDetails;
+    
+        // Verificar se a senha já foi usada
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Esta já é sua senha!");
+        }
+    
+        // Atualizar a senha com criptografia
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+    
 
-        if (newPassword.equals(user.getPassword())) {
-            throw new IllegalArgumentException("Esta já é sua senha atual!");
+    // Alterar nome completo do usuário
+    public void updateName(String login, String newName) {
+        if (newName.isEmpty()) {
+            throw new IllegalArgumentException("O novo nome é obrigatório!");
         }
 
-        user.setpassword(newPassword);
+        UserDetails userDetails = userRepository.findByLogin(login);
+        if (!(userDetails instanceof User)) {
+            throw new IllegalArgumentException("Usuário não encontrado!");
+        }
+        User user = (User) userDetails;
+    
+        // Verificar se o nome já foi usado
+        if (newName.matches(user.getName())){
+            throw new IllegalArgumentException("Esta já é seu nome!");
+        }
+
+        user.setName(newName);
         userRepository.save(user);
     }
 
