@@ -32,9 +32,6 @@ public class SecurityFilter extends OncePerRequestFilter {
         if(token != null){
             var login = tokenService.validateToken(token);
 
-            // Verificar o valor do login extraído do token
-            System.out.println("Login extraído do token: " + login); // ADICIONADO AQUI
-
             UserDetails user = userRepository.findByLogin(login);
 
             if(user != null){

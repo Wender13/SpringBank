@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface TransactionRepository extends MongoRepository<Transaction, String> {
     // Consultar transações onde o usuário remetente (user.id) seja igual ao usuárioId fornecido
-    List<Transaction> findByUser_Id(String userId);
+    List<Transaction> findByUser(String userLogin);
 
     // Consultar transações onde o usuário destinatário (benefited.id) seja igual ao usuarioId fornecido
-    List<Transaction> findByBenefited_Id(String benefitedId);
+    List<Transaction> findByBeneficiary(String beneficiaryLogin);
 }

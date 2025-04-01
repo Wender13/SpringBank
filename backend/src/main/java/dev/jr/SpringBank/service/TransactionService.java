@@ -18,14 +18,32 @@ public class TransactionService {
         this.transactionRepository.save(transaction);
     }
 
-    public List<Transaction> listTransactionsUser(String userId) {
+    public List<Transaction> listTransactionsUser(String userLogin) {
         // Buscando as transações do usuário como remetente ou destinatário
-        List<Transaction> transactionOrigin = transactionRepository.findByUser_Id(userId);
-        List<Transaction> transactionDestination = transactionRepository.findByBenefited_Id(userId);
+        List<Transaction> transactionOrigin = transactionRepository.findByUser(userLogin);
+        List<Transaction> transactionDestination = transactionRepository.findByBeneficiary(userLogin);
 
         // Combinando as transações (remetente + destinatário)
         transactionOrigin.addAll(transactionDestination);
         return transactionOrigin;
     }
+
+    public void updateUserTransactions(String oldLogin, String newLogin) {
+        // Busca as transações onde o usuário é remetente ou destinatário
+        List<Transaction> transactionsAsUser = transactionRepository.findByUser(oldLogin);
+        List<Transaction> transactionsAsBeneficiary = transactionRepository.findByBeneficiary(oldLogin);
+    
+        // Atualiza o login nas transações encontradas
+        for (Transaction transaction : transactionsAsUser) {
+            transaction.setUser(newLogin);
+        }
+        for (Transaction transaction : transactionsAsBeneficiary) {
+            transaction.setBeneficiary(newLogin);
+        }
+    
+        // Salva as transações atualizadas
+        transactionRepository.saveAll(transactionsAsUser);
+        transactionRepository.saveAll(transactionsAsBeneficiary);
+    }  
 
 }

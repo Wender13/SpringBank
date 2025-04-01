@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 import dev.jr.SpringBank.model.Transaction;
+import dev.jr.SpringBank.model.TransactionType;
 
 @Service
 public class UserService {
@@ -47,9 +48,10 @@ public class UserService {
         // Atualiza o login e salva no banco
         currentUser.setLogin(newUserLogin);
         userRepository.save(currentUser);
-    }
-    
-    
+
+        // Atualiza o login nas transações do usuário
+        transactionService.updateUserTransactions(currentLogin, newUserLogin);
+    }    
 
     // Atualizar e-mail do usuário
     public void updateUserEmail(String login, String newEmail) {
@@ -135,7 +137,7 @@ public class UserService {
             user.setBalance(user.getBalance() + value);
             
             // Registro da transação
-            transactionService.registerTransaction(new Transaction(user, "DEPOSITO", value, LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"))));
+            transactionService.registerTransaction(new Transaction(login, null, TransactionType.DEPOSITO, value, LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"))));
             
             return userRepository.save(user);  // Salva o usuário após o depósito
         }
@@ -157,7 +159,7 @@ public class UserService {
             user.setBalance(user.getBalance() - value);
             
             // Registro da transação
-            transactionService.registerTransaction(new Transaction(user, "SAQUE", value, LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"))));
+            transactionService.registerTransaction(new Transaction(login, null, TransactionType.SAQUE, value, LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"))));
             
             return userRepository.save(user);  // Salva o usuário após o depósito
         }
@@ -166,28 +168,47 @@ public class UserService {
     }
 
     // Transferir saldo entre usuários
-    public User transfer(String idOrigin, String idDestination, double value) {
-        Optional<User> originOptional = userRepository.findById(idOrigin);
-        Optional<User> destinationOptional = userRepository.findById(idDestination);
-
-        if (originOptional.isPresent() && destinationOptional.isPresent()) {
-            User userOrigin = originOptional.get();
-            User userDestination = destinationOptional.get();
-
-            if (userOrigin.getBalance() >= value) {
-                userOrigin.setBalance(userOrigin.getBalance() - value);
-                userDestination.setBalance(userDestination.getBalance() + value);
-
-                userRepository.save(userOrigin);
-
-                //Registro da transação
-                transactionService.registerTransaction(new Transaction(userOrigin, userDestination, value, LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"))));
-                return userRepository.save(userDestination);
-            }
-            throw new RuntimeException("Saldo insuficiente para a transferência!");
+    public void transfer(String originLogin, String destinationLogin, double value) {
+        // Impedir valores negativos ou zero
+        if (value <= 0) {
+            throw new IllegalArgumentException("O valor da transferência deve ser maior que zero!");
         }
-        throw new RuntimeException("Um ou ambos os usuários não foram encontrados!");
+    
+        // Impedir transferência para a própria conta
+        if (originLogin.equals(destinationLogin)) {
+            throw new IllegalArgumentException("Não é possível transferir para sua própria conta!");
+        }
+    
+        // Buscar usuário de origem
+        User originUser = (User) userRepository.findByLogin(originLogin);
+        if (originUser == null) {
+            throw new IllegalArgumentException("Usuário de origem não encontrado!");
+        }
+    
+        // Buscar usuário de destino
+        User destinationUser = (User) userRepository.findByLogin(destinationLogin);
+        if (destinationUser == null) {
+            throw new IllegalArgumentException("Usuário de destino não encontrado!");
+        }
+    
+        // Verificar saldo suficiente
+        if (originUser.getBalance() < value) {
+            throw new IllegalArgumentException("Saldo insuficiente!");
+        }
+    
+        // Realizar transferência
+        originUser.setBalance(originUser.getBalance() - value);
+        destinationUser.setBalance(destinationUser.getBalance() + value);
+
+        // Registro da transação
+        transactionService.registerTransaction(new Transaction(originLogin, destinationLogin, TransactionType.TRANSFERENCIA, value, LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"))));
+    
+        // Salvar alterações
+        userRepository.save(originUser);
+        userRepository.save(destinationUser);
     }
+    
+    
 
     // Remover usuário
     public void deleteUser(String login) {

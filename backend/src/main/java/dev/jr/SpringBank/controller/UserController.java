@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @RestController
 @RequestMapping("/users")
-public class UsuarioController {
+public class UserController {
     
     @Autowired
     private UserService userService;
@@ -67,35 +67,45 @@ public class UsuarioController {
 
     // Excluir usuário por login
     @DeleteMapping("/delete/{login}")
-    public ResponseEntity<?> deleteUser(@RequestParam String login) {
+    public ResponseEntity<?> deleteUser(@PathVariable String login) {
+        System.out.println("Tentando excluir o usuário: " + login);
+
         User userFromDb = userService.findUserByLogin(login);
         if (userFromDb == null) {
+            System.out.println("Usuário não encontrado!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado.");
         }
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
         if (auth.getPrincipal() instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) auth.getPrincipal();
             String authenticatedLogin = userDetails.getUsername();
 
-            // Se o usuário autenticado for "ADMIN" e não estiver tentando deletar a própria conta, ele pode excluir
             boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
 
-            if (!authenticatedLogin.equals(login) && !isAdmin) {
+            if (authenticatedLogin.equals(login)) {
+                System.out.println("Usuário autorizado a se excluir.");
+                userService.deleteUser(login);
+                return ResponseEntity.ok("Usuário deletado com sucesso.");
+            }
+
+            if (!isAdmin) {
+                System.out.println("Usuário sem permissão para excluir outra conta.");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Você só pode excluir sua própria conta.");
             }
 
-            // Se for ADMIN, mas está tentando excluir a própria conta, bloqueamos a ação
             if (authenticatedLogin.equals(login) && isAdmin) {
+                System.out.println("Admin tentando se excluir. Ação bloqueada.");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Admins não podem excluir a própria conta.");
             }
 
+            System.out.println("Admin excluiu outro usuário.");
             userService.deleteUser(login);
             return ResponseEntity.ok("Usuário deletado com sucesso.");
         }
 
+        System.out.println("Erro de autenticação.");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erro de autenticação.");
     }
 

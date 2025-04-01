@@ -29,7 +29,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()  // Permitir login sem autenticação
                 .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()  // Permitir registro sem autenticação
-                .requestMatchers(HttpMethod.DELETE, "/users/delete/{login}").hasRole("ADMIN")  // Apenas admins podem deletar usuários
+                .requestMatchers(HttpMethod.DELETE, "/users/delete/{login}").authenticated()  // Apenas admins podem deletar usuários
                 .requestMatchers(HttpMethod.PUT, "/users").hasAnyRole("ADMIN", "USER")  // Administradores podem modificar qualquer conta, usuários podem modificar seus próprios dados
                 .anyRequest().authenticated()  // Requer autenticação para todas as outras requisições
             )
