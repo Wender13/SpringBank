@@ -1,244 +1,228 @@
 # SpringBank
 
-**SpringBank** é uma aplicação backend desenvolvida em Java com Spring Boot, projetada para gerenciar autenticação de usuários e operações bancárias, como login, registro, depósitos, saques e transferências. Este projeto foi desenvolvido para estudos e pode ser utilizado como base para um sistema de banco digital.
-
----
+SpringBank é uma aplicação backend desenvolvida em Java com Spring Boot para gerenciamento de autenticação de usuários, incluindo login, registro e operações bancárias.
 
 ## Tecnologias Utilizadas
 
 - **Java 21**
-- **Spring Boot 3.4.4**
+- **Spring Boot**
 - **Spring Security**
 - **BCrypt** (para criptografia de senhas)
 - **JWT** (JSON Web Token para autenticação)
 - **MongoDB** (banco de dados NoSQL)
-- **Lombok** (redução de código boilerplate)
-- **Javax Validation API** (para validação de dados)
-- **Java JWT** (para manipulação de tokens JWT)
 
----
+## Instalação e Execução
 
-## Configuração do Ambiente
+1. Clone o repositório:
+   ```sh
+   git clone https://github.com/seu-usuario/SpringBank.git
+   ```
+2. Acesse o diretório do projeto:
+   ```sh
+   cd SpringBank
+   ```
+3. Configure o banco de dados MongoDB no `application.properties` ou `application.yml`.
+4. Compile e execute a aplicação:
+   ```sh
+   mvn spring-boot:run
+   ```
 
-A aplicação utiliza o arquivo `application.properties` para configurar parâmetros essenciais:
+## Endpoints
 
-```properties
-spring.application.name=SpringBank
+### Autenticação
 
-spring.data.mongodb.uri=mongodb://localhost:27017/SpringBank
+#### Login
 
-api.security.token.secret=${JWT_SECRET:my-secret-key}
+**POST** `/auth/login`
 
-    spring.application.name: Nome da aplicação.
+**Corpo da requisição:**
 
-    spring.data.mongodb.uri: URI para conexão com o MongoDB.
-
-    api.security.token.secret: Chave secreta para assinatura dos tokens JWT (pode ser sobrescrita pela variável de ambiente JWT_SECRET).
-
-Estrutura do Projeto
-Ponto de Entrada
-
-A classe principal é SpringBankApplication, localizada no pacote dev.jr.SpringBank, responsável por iniciar a aplicação Spring Boot:
-
-package dev.jr.SpringBank;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-
-@SpringBootApplication
-@ComponentScan(basePackages = "dev.jr.SpringBank") // Escaneia todos os componentes do projeto
-public class SpringBankApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(SpringBankApplication.class, args);
-    }
-}
-
-Gerenciamento de Dependências
-
-O projeto utiliza o Maven para gerenciamento de dependências. Abaixo, um trecho do pom.xml com as principais dependências:
-
-<dependencies>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-mongodb</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-test</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>javax.validation</groupId>
-        <artifactId>validation-api</artifactId>
-        <version>2.0.1.Final</version>
-    </dependency>
-    <dependency>
-        <groupId>com.auth0</groupId>
-        <artifactId>java-jwt</artifactId>
-        <version>4.5.0</version>
-    </dependency>
-</dependencies>
-
-Executando o Projeto
-Pré-requisitos
-
-    Java 21 instalado.
-
-    Maven instalado.
-
-    MongoDB em execução e configurado conforme o arquivo application.properties.
-
-Passos
-
-    Clone o repositório:
-
-git clone https://github.com/seu-usuario/SpringBank.git
-
-Acesse o diretório do projeto:
-
-cd SpringBank
-
-Configure o banco de dados:
-Certifique-se de que o MongoDB está ativo e configurado conforme o arquivo de propriedades.
-
-Compile e execute a aplicação:
-
-    mvn spring-boot:run
-
-Endpoints da API
-Autenticação
-
-    Login
-    POST /auth/login
-    Corpo da requisição:
-
+```json
 {
   "login": "usuario",
   "password": "senha"
 }
+```
 
-Resposta:
+**Resposta:**
 
+```json
 {
   "token": "jwt-token-gerado"
 }
-
-Registro
-POST /auth/register
-Corpo da requisição:
-
-    {
-      "login": "usuario",
-      "password": "senha",
-      "name": "Nome Completo",
-      "email": "email@exemplo.com",
-      "cpf": "12345678900"
-    }
-
-    Respostas:
-
-        200 OK: Registro bem-sucedido.
-
-        400 Bad Request: Login já existente.
-
-Gerenciamento de Usuários
-
-    Atualizar Login
-    PUT /users/changeUserLogin
-    Parâmetros: currentLogin, newUserLogin
-    Resposta: Login atualizado com sucesso.
-
-    Atualizar E-mail
-    PUT /users/changeUserEmail
-    Parâmetros: login, newUserEmail
-    Resposta: E-mail atualizado com sucesso.
-
-    Atualizar Senha
-    PUT /users/changeUserPassword
-    Parâmetros: login, newUserPassword
-    Resposta: Senha atualizada com sucesso.
-
-    Atualizar Nome Completo
-    PUT /users/changeUserName
-    Parâmetros: login, newUserName
-    Resposta: Nome atualizado com sucesso.
-
-    Excluir Usuário
-    DELETE /users/delete/{login}
-    Respostas:
-
-        200 OK: Usuário deletado com sucesso.
-
-        403 Forbidden: Exclusão permitida apenas para a própria conta.
-
-        404 Not Found: Usuário não encontrado.
-
-Operações Bancárias
-
-    Depósito
-    PUT /users/deposit/{login}/{value}
-    Resposta: Depósito de R$ {value} realizado com sucesso.
-
-    Saque
-    PUT /users/withdraw/{login}/{value}
-    Resposta: R$ {value} sacado com sucesso.
-
-    Transferência
-    POST /users/transfer/{originLogin}/{destinationLogin}/{value}
-    Resposta: R$ {value} transferido com sucesso.
-
-Validação de Dados
-
-Os DTOs do projeto possuem regras de validação para garantir a integridade dos dados:
-
-    AuthDTO: Garante que login e senha não sejam nulos ou vazios.
-
-    RegisterDTO: Valida os campos obrigatórios (login, senha, nome, e-mail e CPF).
-
-    LoginResponseDTO: Retorna um token JWT válido para autenticação.
-
-Configuração de Segurança
-
-A aplicação utiliza Spring Security para gerenciar autenticação e autorização, com as seguintes configurações principais:
-
-    Autenticação Stateless: Sem uso de sessões.
-
-    Proteção CSRF Desativada: Adequada para APIs REST.
-
-    Regras de Permissão:
-
-        Login e Registro: Acesso público.
-
-        Exclusão e Modificação de Usuários: Acesso restrito aos usuários autenticados (com papéis ADMIN ou USER para alterações nos próprios dados).
-
-        Outras Requisições: Requerem autenticação.
-
-Além disso, um filtro de segurança intercepta as requisições para validar tokens JWT e autenticar os usuários.
-Contribuição
-
-Contribuições são bem-vindas! Se você deseja melhorar o projeto, siga estes passos:
-
-    Faça um fork do repositório.
-
-    Crie uma branch para sua feature ou correção.
-
-    Envie um Pull Request com suas alterações.
 ```
+
+#### Registro
+
+**POST** `/auth/register`
+
+**Corpo da requisição:**
+
+```json
+{
+  "login": "usuario",
+  "password": "senha",
+  "name": "Nome Completo",
+  "email": "email@exemplo.com",
+  "cpf": "12345678900"
+}
+```
+
+**Respostas:**
+
+- `200 OK`: Registro bem-sucedido
+- `400 Bad Request`: Login já existente
+
+### Gerenciamento de Usuários
+
+#### Atualizar login
+
+**PUT** `/users/changeUserLogin`
+
+**Parâmetros:** `currentLogin`, `newUserLogin`
+
+**Resposta:** `Login atualizado com sucesso.`
+
+#### Atualizar e-mail
+
+**PUT** `/users/changeUserEmail`
+
+**Parâmetros:** `login`, `newUserEmail`
+
+**Resposta:** `E-mail atualizado com sucesso.`
+
+#### Atualizar senha
+
+**PUT** `/users/changeUserPassword`
+
+**Parâmetros:** `login`, `newUserPassword`
+
+**Resposta:** `Senha atualizada com sucesso.`
+
+#### Atualizar nome completo
+
+**PUT** `/users/changeUserName`
+
+**Parâmetros:** `login`, `newUserName`
+
+**Resposta:** `Nome atualizado com sucesso.`
+
+#### Excluir usuário
+
+**DELETE** `/users/delete/{login}`
+
+**Resposta:**
+
+- `200 OK`: Usuário deletado com sucesso.
+- `403 Forbidden`: Você só pode excluir sua própria conta.
+- `404 Not Found`: Usuário não encontrado.
+
+### Operações Bancárias
+
+#### Depósito
+
+**PUT** `/users/deposit/{login}/{value}`
+
+**Resposta:** `Depósito de R$ {value} realizado com sucesso.`
+
+#### Saque
+
+**PUT** `/users/withdraw/{login}/{value}`
+
+**Resposta:** `R$ {value} sacado com sucesso.`
+
+#### Transferência entre usuários
+
+**POST** `/users/transfer/{originLogin}/{destinationLogin}/{value}`
+
+**Resposta:** `R$ {value} transferido com sucesso.`
+
+## Validação de Dados
+
+Os seguintes DTOs possuem regras de validação para garantir a integridade dos dados:
+
+- **AuthDTO**: O login e a senha não podem ser nulos ou vazios.
+- **RegisterDTO**: Campos como login, senha, nome, e-mail e CPF devem ser informados corretamente.
+- **LoginResponseDTO**: Retorna um token JWT válido para autenticação.
+
+## Repositórios
+
+### Repositório de Transações
+
+O `TransactionRepository` é responsável pelo gerenciamento das transações no banco de dados MongoDB.
+
+#### Métodos Disponíveis
+
+- `findByUser(String userLogin)`: Retorna todas as transações onde o usuário de origem tem o login especificado.
+- `findByBeneficiary(String beneficiaryLogin)`: Retorna todas as transações onde o usuário de destino tem o login especificado.
+
+### Repositório de Usuários
+
+O `UserRepository` é responsável pelo gerenciamento dos dados dos usuários no banco de dados MongoDB.
+
+#### Métodos Disponíveis
+
+- `findByCPF(String cpf)`: Busca um usuário pelo CPF.
+- `findByLogin(String login)`: Retorna os detalhes de um usuário pelo login.
+- `findByEmailAndPassword(String email, String password)`: Busca um usuário pelo e-mail e senha.
+- `findByCPFAndPassword(String cpf, String password)`: Busca um usuário pelo CPF e senha.
+- `findByEmailAndCPF(String email, String cpf)`: Retorna um usuário com base no e-mail e CPF.
+- `findByEmail(String email)`: Retorna um usuário com base no e-mail.
+- `deleteByLogin(String login)`: Exclui um usuário com base no login.
+
+## Configuração de Segurança
+
+A aplicação utiliza **Spring Security** para gerenciar autenticação e autorização.
+
+### Principais Configurações
+
+- **Autenticação Stateless**: Configurada para não utilizar sessões.
+- **Proteção CSRF desativada**: Para facilitar a API REST.
+- **Regras de Permissão:**
+  - **Login e Registro**: Acesso público.
+  - **Exclusão de Usuário**: Apenas usuários autenticados.
+  - **Modificação de Usuários**: Apenas **ADMIN** e **USER** podem modificar seus próprios dados.
+  - **Todas as outras requisições**: Requerem autenticação.
+
+### Filtro de Segurança
+
+O `SecurityFilter` intercepta requisições para validar tokens JWT e autenticar usuários. Se o token for válido, o usuário é autenticado no contexto de segurança.
+
+#### Exemplo de Implementação
+
+```java
+@Override
+protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    var token = this.recoverToken(request);
+    if(token != null){
+        var login = tokenService.validateToken(token);
+        UserDetails user = userRepository.findByLogin(login);
+        if(user != null){
+            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+    }
+    filterChain.doFilter(request, response);
+}
+```
+
+## Dependências Maven
+
+O projeto utiliza as seguintes bibliotecas principais no `pom.xml`:
+
+- `spring-boot-starter-web`: Criação de APIs REST.
+- `spring-boot-starter-security`: Autenticação e autorização com Spring Security.
+- `spring-boot-starter-data-mongodb`: Integração com MongoDB.
+- `java-jwt`: Geração e validação de tokens JWT.
+- `lombok`: Geração automática de getters/setters e construtores.
+- `validation-api`: Validação de dados de entrada.
+- `javax.servlet-api`: Suporte a servlets.
+- `spring-boot-starter-test` e `spring-security-test`: Testes automatizados.
+
+## Contribuição
+
+Sinta-se à vontade para contribuir! Forke o repositório, crie uma branch e abra um Pull Request.
+
+## Licença
+
+Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
