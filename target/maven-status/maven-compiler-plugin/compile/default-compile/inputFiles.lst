@@ -11,6 +11,7 @@
 /home/jr/SpringBank/src/main/java/dev/jr/SpringBank/model/UserRole.java
 /home/jr/SpringBank/src/main/java/dev/jr/SpringBank/repository/TransactionRepository.java
 /home/jr/SpringBank/src/main/java/dev/jr/SpringBank/repository/UserRepository.java
+/home/jr/SpringBank/src/main/java/dev/jr/SpringBank/security/CorsConfig.java
 /home/jr/SpringBank/src/main/java/dev/jr/SpringBank/security/SecurityConfig.java
 /home/jr/SpringBank/src/main/java/dev/jr/SpringBank/security/SecurityFilter.java
 /home/jr/SpringBank/src/main/java/dev/jr/SpringBank/security/TokenService.java
